@@ -1,0 +1,39 @@
+@font-face {
+  font-family: "ProximaNova";
+  src: url("/fonts/ProximaNovaRegular.woff") format("woff"), url("/fonts/ProximaNovaRegular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ProximaNova";
+  src: url("/fonts/ProximaNovaBold.woff") format("woff"), url("/fonts/ProximaNovaBold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Unbounded";
+  src: url("/fonts/UnboundedBold.woff") format("woff"), url("/fonts/UnboundedBold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Unbounded";
+  src: url("/fonts/UnboundedMedium.woff") format("woff"), url("/fonts/UnboundedMedium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Unbounded";
+  src: url("/fonts/UnboundedRegular.woff") format("woff"), url("/fonts/UnboundedRegular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

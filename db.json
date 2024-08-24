@@ -1,19 +1,19 @@
 {
   "contacts": [
     {
-      "Id": 1,
+      "Id": 0,
       "Name": "Байден Джо",
       "Email": "joebidon@gmail.com",
       "Phone": "+3 (666) 572-00-20"
     },
     {
-      "Id": 2,
+      "Id": 1,
       "Name": "Моск Илона",
       "Email": "ilonamosk@mail.ru",
       "Phone": "+7 (873) 452-44-32"
     },
     {
-      "Id": 3,
+      "Id": 2,
       "Name": "Кристина",
       "Email": "krispriz@yandex.ru",
       "Phone": "+7 (955) 918-32-33"

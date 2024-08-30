@@ -18,8 +18,7 @@ export default {
   },
   methods: {
     goAddContact() {
-      this.$emit('isOpenPopupForm', true); 
-      this.$emit('typePopup', 'add');
+      this.$router.push({ path: '/addContact' });
     },
   },
 };

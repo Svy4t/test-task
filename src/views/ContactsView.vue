@@ -1,15 +1,15 @@
 <template>
-  <popupFormContactComponent @isOpenPopupForm="(n) => (isOpenPopupForm = n)" :isOpenPopupForm="isOpenPopupForm" :idContact="contacts.length" :typePopup="typePopup" :selectedContact="selectedContact"></popupFormContactComponent>
+  <!-- <popupFormContactComponent @isOpenPopupForm="(n) => (isOpenPopupForm = n)" :isOpenPopupForm="isOpenPopupForm" :idContact="contacts.length" :typePopup="typePopup" :selectedContact="selectedContact"></popupFormContactComponent> -->
   <div class="contacts">
-    <headerComponent @isOpenPopupForm="(n) => (isOpenPopupForm = n)" @typePopup="(n) => (typePopup = n)"></headerComponent>
+    <headerComponent></headerComponent>
     <div class="contacts__table contacts-table">
       <div class="contacts-table__header">
         <span class="contacts-table__header-name" @click="nameFiltering()">
           Имя
-          <svg v-if="isFilteredName === 'corrently'" width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg v-if="isFilteredName === 'reverse'" width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6.7273 8.5L3.86366 11.5M3.86366 11.5L1.00002 8.5M3.86366 11.5L3.86366 1" stroke="#7D7B8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          <svg v-if="isFilteredName === 'reverse'" width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg v-if="isFilteredName === 'corrently'" width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1 4L3.86364 1M3.86364 1L6.72727 4M3.86364 1V11.5" stroke="#7D7B8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </span>
@@ -17,7 +17,7 @@
         <span class="contacts-table__header-phone">Телефон</span>
       </div>
       <div class="contacts-table__body">
-        <contactComponent v-for="contact in filteredContacts" :key="contact.Id" :contact="contact" @typePopup="(n) => (typePopup = n)" @selectedContact="(n) => (selectedContact = n)" @isOpenPopupForm="(n) => (isOpenPopupForm = n)"></contactComponent>
+        <contactComponent v-for="contact in filteredContacts" :key="contact.Id" :contact="contact"></contactComponent>
       </div>
     </div>
   </div>
@@ -26,41 +26,37 @@
 <script>
 import contactComponent from "@/components/contactComponent.vue";
 import headerComponent from "@/components/headerComponent.vue";
-import popupFormContactComponent from "@/components/popupFormContactComponent.vue";
-import { useContactsStore } from "@/stores/ContactsStore";
-import axios from "axios";
+// import { useContactsStore } from "@/stores/ContactsStore";
 
 export default {
-  emits: {
-    isOpenPopupForm: Boolean,
-    typePopup: String,
-    selectedContact: Number,
+  props: {
+    contacts: Array,
   },
   components: {
     headerComponent,
     contactComponent,
-    popupFormContactComponent,
   },
   data() {
     return {
       selectedContact: {},
       typePopup: "",
       isOpenPopupForm: false,
-      contactsStore: {},
+      contactsStore: [],
       filteredContacts: [],
-      contacts: [],
-      filterStatuses: ["none", "corrently", "reverse"],
-      isFilteredName: "none",
+      filterStatuses: ["corrently", "reverse"],
+      isFilteredName: "corrently",
     };
   },
   created() {
-    this.contactsStore = useContactsStore();
-    this.getContactsFromServer();
+    this.contactsStore = this.contacts;
+    this.nameFiltering();
   },
   watch: {
-    selectedContact(e) {
-      console.log(e);
-    }
+    contacts(e) {
+      // console.log(e);
+      this.contactsStore = e;
+      this.nameFiltering();
+    },
   },
   methods: {
     nameFiltering() {
@@ -69,17 +65,8 @@ export default {
       else index++;
       this.isFilteredName = this.filterStatuses[index++];
       switch (this.isFilteredName) {
-        case "none":
-          this.filteredContacts = this.contacts.sort((a, b) => {
-            const nameA = a.Id;
-            const nameB = b.Id;
-            if (nameA < nameB) return -1;
-            if (nameA > nameB) return 1;
-            return 0;
-          });
-          break;
-        case "corrently":
-          this.filteredContacts = this.contacts.sort((a, b) => {
+        case "reverse":
+          this.filteredContacts = this.contactsStore.sort((a, b) => {
             const nameA = a.Name.toUpperCase();
             const nameB = b.Name.toUpperCase();
             if (nameA < nameB) return -1;
@@ -87,8 +74,8 @@ export default {
             return 0;
           });
           break;
-        case "reverse":
-          this.filteredContacts = this.contacts.sort((a, b) => {
+        case "corrently":
+          this.filteredContacts = this.contactsStore.sort((a, b) => {
             const nameA = a.Name.toUpperCase();
             const nameB = b.Name.toUpperCase();
             if (nameA < nameB) return 1;
@@ -97,19 +84,7 @@ export default {
           });
           break;
       }
-      console.log(this.filteredContacts);
-    },
-    getContactsFromServer() {
-      axios
-        .get("https://my-json-server.typicode.com/Svy4t/test-task/contacts")
-        .then((response) => {
-          const res = response.data;
-          const responseFromPinia = this.contactsStore.putContactsInStorage(res);
-          console.log("Контакты загружены)", responseFromPinia);
-          this.filteredContacts = responseFromPinia;
-          this.contacts = responseFromPinia;
-        })
-        .catch((error) => console.log(error.data));
+      // console.log(this.filteredContacts);
     },
   },
 };

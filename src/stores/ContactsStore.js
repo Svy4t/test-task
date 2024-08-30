@@ -30,6 +30,13 @@ export const useContactsStore = defineStore("сontactsStore", {
     putContactsInStorage(array) {
       this.contacts = array;
       return this.contacts;
+    },
+    getContact(Id) {
+      let contact;
+      this.contacts.forEach((el) => {
+        if (el.Id === Id) contact = el;
+      });
+      return contact;
     }
   },
 });

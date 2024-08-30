@@ -1,5 +1,5 @@
 <template>
-  <div class="contact-table__item contact-item" @click="editContact()">
+  <div class="contact-table__item contact-item" @click="editContact(contact.Id)">
     <span class="contact-item__name">{{ contact.Name }}</span>
     <span class="contact-item__email">{{ contact.Email }}</span>
     <span class="contact-item__phone">{{ contact.Phone }}</span>
@@ -16,10 +16,8 @@ export default {
     },
   },
   methods: {
-    editContact() {
-      this.$emit('typePopup', 'edit');
-      this.$emit('selectedContact', this.contact);
-      this.$emit('isOpenPopupForm', true);
+    editContact(id) {
+      this.$router.push({ path: `/editContact/${id}` });
     }
   },
 };

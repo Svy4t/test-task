@@ -4,8 +4,35 @@
     <router-link to="/about">About</router-link> |
     <router-link to="/login">Login</router-link>
   </nav> -->
-  <router-view />
+  <router-view :contacts="contactsStore.contacts"/>
 </template>
+
+<script>
+import { useContactsStore } from "@/stores/ContactsStore";
+import axios from "axios";
+
+export default {
+  setup() {
+    let contactsStore = useContactsStore();
+
+    return { contactsStore };
+  },
+  created() {
+    this.getContactsFromServer();
+  },
+  methods: {
+    getContactsFromServer() {
+      axios
+        .get("https://my-json-server.typicode.com/Svy4t/test-task/contacts")
+        .then((response) => {
+          const res = response.data;
+          this.contactsStore.putContactsInStorage(res);
+        })
+        .catch((error) => console.log(error.data));
+    },
+  },
+};
+</script>
 
 <style>
 :root {

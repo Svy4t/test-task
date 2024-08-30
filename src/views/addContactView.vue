@@ -1,3 +1,93 @@
+<script setup>
+import { useRouter, useRoute } from 'vue-router'
+import { useContactsStore } from "@/stores/ContactsStore";
+import { IMaskDirective } from "vue-imask";
+
+const router = useRouter();
+const route = useRoute();
+
+// eslint-disable-next-line
+const props = defineProps({
+  contacts: Array
+});
+
+// eslint-disable-next-line
+const isCompleteInputPhone = defineModel('isCompleteInputPhone',{type: Boolean});
+isCompleteInputPhone.value = true;
+// eslint-disable-next-line
+const isCompleteInputEmail = defineModel('isCompleteInputEmail',{type: Boolean});
+isCompleteInputEmail.value = true;
+// eslint-disable-next-line
+const isCompleteInputName = defineModel('isCompleteInputName',{type: Boolean});
+isCompleteInputName.value = true;
+
+let contactsStore = useContactsStore();
+let maskPhone = {
+  mask: "{+7 (}000{) }000{-}00{-}00",
+  lazy: true,
+};
+let inputName = "";
+let inputEmail = "";
+let inputPhone = "";
+let id = parseInt(route.params.id);
+let isEditMode = id > -1 ? true : false;
+if (isEditMode) getContact(id);
+
+function goHome() {
+  router.push({ path: `/` });
+}
+
+function onAccept() {
+  isCompleteInputPhone.value = false;
+}
+
+function onComplete() {
+  isCompleteInputPhone.value = true;
+}
+
+function onChangeEmail(e) {
+  try {
+    const value = e.target.value;
+    const domen = value.split("@")[1].split(".")[1];
+    console.log(domen);
+    if (domen === "ru" || domen === "com") isCompleteInputEmail.value = true;
+    else isCompleteInputEmail.value = false;
+  } catch (error) {
+    isCompleteInputEmail.value = false;
+  }
+  console.log(isCompleteInputEmail);
+}
+
+function onChangeName(e) {
+  const value = e.target.value;
+  if (value.length > 2) isCompleteInputName.value = true;
+  else isCompleteInputName.value = false;
+}
+
+function addContactInStore() {
+  let Id = props.contacts.length;
+  if (isCompleteInputPhone && isCompleteInputEmail && isCompleteInputName) {
+    contactsStore.addContact(Id, inputName, inputEmail, inputPhone);
+    router.push({ path: `/` });
+  } else alert("Данные неверны или пустые, проверьте введенные данные!");
+}
+
+function editContactInStore(Id) {
+  if (isCompleteInputPhone && isCompleteInputEmail && isCompleteInputName) {
+    contactsStore.editContact(Id, inputName, inputEmail, inputPhone);
+    router.push({ path: `/` });
+  } else alert("Данные неверны или пустые, проверьте введенные данные!");
+}
+
+function getContact(Id) {
+  let contact = contactsStore.getContact(Id);
+  console.log(contact);
+  inputName = contact.Name;
+  inputEmail = contact.Email;
+  inputPhone = contact.Phone;
+}
+</script>
+
 <template>
   <div class="form-wrapper">
     <button class="form__btn-close" @click="goHome()">
@@ -15,9 +105,10 @@
           <input
             id="form-name__input"
             type="text"
+            @change="onChangeName"
             v-model="inputName"
             class="form-name__input form__input"
-            v-bind:class="{
+            :class="{
               'error-input': !isCompleteInputName,
             }"
             placeholder="Иванов Иван Иванович"
@@ -30,7 +121,7 @@
             type="text"
             v-model="inputEmail"
             class="form-email__input form__input"
-            v-bind:class="{
+            :class="{
               'error-input': !isCompleteInputEmail,
             }"
             @change="onChangeEmail"
@@ -47,7 +138,7 @@
             @accept="onAccept()"
             @complete="onComplete()"
             class="form-phone__input form__input"
-            v-bind:class="{
+            :class="{
               'error-input': !isCompleteInputPhone,
             }"
             placeholder="+7 (999) 999-99-99"
@@ -61,86 +152,7 @@
 </template>
 
 <script>
-import { useContactsStore } from "@/stores/ContactsStore";
-import { IMaskDirective } from "vue-imask";
-
 export default {
-  props: {
-    contacts: Array,
-  },
-  setup() {
-    let contactsStore = useContactsStore();
-    let maskPhone = {
-      mask: "{+7 (}000{) }000{-}00{-}00",
-      lazy: true,
-    };
-
-    return { contactsStore, maskPhone };
-  },
-  data() {
-    return {
-      inputName: "",
-      inputEmail: "",
-      inputPhone: "",
-      contact: "",
-      isCompleteInputPhone: true,
-      isCompleteInputEmail: true,
-      isCompleteInputName: true,
-      id: parseInt(this.$route.params.id),
-    };
-  },
-  created() {
-    this.isEditMode = this.id > -1 ? true : false;
-    if (this.isEditMode) this.getContact(this.id);
-  },
-  watch: {},
-  methods: {
-    goHome() {
-      this.$router.push({ path: `/` });
-    },
-    onAccept() {
-      this.isCompleteInputPhone = false;
-    },
-    onComplete() {
-      this.isCompleteInputPhone = true;
-    },
-    onChangeEmail(e) {
-      try {
-        const value = e.target.value;
-        const domen = value.split("@")[1].split(".")[1];
-        console.log(domen);
-        if (domen === "ru" || domen === "com") this.isCompleteInputEmail = true;
-        else this.isCompleteInputEmail = false;
-      } catch (error) {
-        this.isCompleteInputEmail = false;
-      }
-    },
-    onChangeName(e) {
-      const value = e.target.value;
-      if (value.length > 2) this.isCompleteInputEmail = true;
-      else this.isCompleteInputEmail = false;
-    },
-    addContactInStore() {
-      let Id = this.contacts.length;
-      if (this.isCompleteInputPhone && this.isCompleteInputEmail && this.isCompleteInputName) {
-        this.contactsStore.addContact(Id, this.inputName, this.inputEmail, this.inputPhone);
-        this.$router.push({ path: `/` });
-      } else alert("Данные неверны или пустые, проверьте введенные данные!");
-    },
-    editContactInStore(Id) {
-      if (this.isCompleteInputPhone && this.isCompleteInputEmail && this.isCompleteInputName) {
-        this.contactsStore.editContact(Id, this.inputName, this.inputEmail, this.inputPhone);
-        this.$router.push({ path: `/` });
-      } else alert("Данные неверны или пустые, проверьте введенные данные!");
-    },
-    getContact(Id) {
-      this.contact = this.contactsStore.getContact(Id);
-      // console.log(this.contact);
-      this.inputName = this.contact.Name;
-      this.inputEmail = this.contact.Email;
-      this.inputPhone = this.contact.Phone;
-    },
-  },
   directives: {
     imask: IMaskDirective,
   },
